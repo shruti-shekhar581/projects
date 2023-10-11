@@ -1,0 +1,210 @@
+#library management system
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Book {
+    private String title;
+    private String author;
+    private boolean available;
+
+    public Book(String title, String author) {
+        this.title = title;
+        this.author = author;
+        this.available = true;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+}
+
+class Library {
+    private List<Book> books;
+
+    public Library() {
+        books = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void removeBook(Book book) {
+        books.remove(book);
+    }
+
+    public List<Book> searchByTitle(String title) {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getTitle().equalsIgnoreCase(title)) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+
+    public List<Book> searchByAuthor(String author) {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getAuthor().equalsIgnoreCase(author)) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+
+    public List<Book> getAvailableBooks() {
+        List<Book> result = new ArrayList<>();
+        for (Book book : books) {
+            if (book.isAvailable()) {
+                result.add(book);
+            }
+        }
+        return result;
+    }
+}
+
+public class LibraryManagementSystem {
+    private static Library library;
+    private static Scanner scanner;
+
+    public static void main(String[] args) {
+        library = new Library();
+        scanner = new Scanner(System.in);
+
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("Library Management System");
+            System.out.println("1. Add Book");
+            System.out.println("2. Remove Book");
+            System.out.println("3. Search by Title");
+            System.out.println("4. Search by Author");
+            System.out.println("5. List Available Books");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            switch (choice) {
+                case 1:
+                    addBook();
+                    break;
+                case 2:
+                    removeBook();
+                    break;
+                case 3:
+                    searchByTitle();
+                    break;
+                case 4:
+                    searchByAuthor();
+                    break;
+                case 5:
+                    listAvailableBooks();
+                    break;
+                case 6:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+                    break;
+            }
+
+            System.out.println();
+        }
+
+        scanner.close();
+    }
+
+    private static void addBook() {
+        System.out.print("Enter the title of the book: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter the author of the book: ");
+        String author = scanner.nextLine();
+
+        Book book = new Book(title, author);
+        library.addBook(book);
+
+        System.out.println("Book added successfully.");
+    }
+
+    private static void removeBook() {
+        System.out.print("Enter the title of the book to remove: ");
+        String title = scanner.nextLine();
+        System.out.print("Enter the author of the book to remove: ");
+        String author = scanner.nextLine();
+
+        List<Book> booksToRemove = library.searchByTitle(title);
+        booksToRemove.retainAll(library.searchByAuthor(author));
+
+        if (booksToRemove.isEmpty()) {
+            System.out.println("No matching book found.");
+        } else if (booksToRemove.size() == 1) {
+            Book book = booksToRemove.get(0);
+            library.removeBook(book);
+            System.out.println("Book removed successfully.");
+        } else {
+            System.out.println("Multiple matching books found. Please provide additional information.");
+            System.out.print("Enter the index of the book to remove: ");
+            int index = scanner.nextInt();
+            scanner.nextLine(); // Consume newline character
+
+            if (index >= 1 && index <= booksToRemove.size()) {
+                Book book = booksToRemove.get(index - 1);
+                library.removeBook(book);
+                System.out.println("Book removed successfully.");
+            } else {
+                System.out.println("Invalid index. Book removal canceled.");
+            }
+        }
+    }
+
+    private static void searchByTitle() {
+        System.out.print("Enter the title to search: ");
+        String title = scanner.nextLine();
+
+        List<Book> books = library.searchByTitle(title);
+        displayBooks(books);
+    }
+
+    private static void searchByAuthor() {
+        System.out.print("Enter the author to search: ");
+        String author = scanner.nextLine();
+
+        List<Book> books = library.searchByAuthor(author);
+        displayBooks(books);
+    }
+
+    private static void listAvailableBooks() {
+        List<Book> books = library.getAvailableBooks();
+        displayBooks(books);
+    }
+
+    private static void displayBooks(List<Book> books) {
+        if (books.isEmpty()) {
+            System.out.println("No books found.");
+        } else {
+            System.out.println("Books:");
+            for (int i = 0; i < books.size(); i++) {
+                Book book = books.get(i);
+                System.out.println((i + 1) + ". " + book.getTitle() + " by " + book.getAuthor());
+            }
+        }
+    }
+}
